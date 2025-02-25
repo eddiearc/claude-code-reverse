@@ -1,5 +1,7 @@
 # Claude Code Reverse Engineering
 
+[中文版](./README.zh_CN.md)
+
 After Anthropic released [Claude Code](https://www.anthropic.com/news/claude-3-7-sonnet), I immediately wanted to test this "AI agent from the company that's best at coding with AI".
 
 Unfortunately, Claude Code paused registrations due to high traffic load. However, both documentation and installation methods reveal it's built on Node.JS and distributed as an NPM package. Though the code repository isn't open source, JavaScript development means: NO SECRETS!
@@ -506,8 +508,8 @@ Our task is "simple": analyze the single file `cli.mjs`.
 
 However, there are challenges:
 
--   All code is processed by [uglify](<https://en.wikipedia.org/wiki/Minification_(programming)>), making it largely unreadable.
--   The file is 4.6MB. Attempts to directly analyze it with ChatGPT, Gemini, or Claude resulted in either warnings about excessive content length or UI freezes.
+- All code is processed by [uglify](<https://en.wikipedia.org/wiki/Minification_(programming)>), making it largely unreadable.
+- The file is 4.6MB. Attempts to directly analyze it with ChatGPT, Gemini, or Claude resulted in either warnings about excessive content length or UI freezes.
 
 Without LLMs, reverse-engineering the details of such large codebases often takes weeks. With LLM assistance, we can complete this task within an hour, with better results.
 
