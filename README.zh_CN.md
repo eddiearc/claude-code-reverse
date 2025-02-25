@@ -1,50 +1,50 @@
-# Claude Code Reverse Engineering
+# Claude Code 逆向工程
 
-After Anthropic released [Claude Code](https://www.anthropic.com/news/claude-3-7-sonnet), I immediately wanted to test this "AI agent from the company that's best at coding with AI".
+Anthropic 发布 [Claude Code](https://www.anthropic.com/news/claude-3-7-sonnet) 之后我第一时间想尝试一下，看看「最会用 AI 写代码的」AI 公司做的 AI agent 会是什么样子。
 
-Unfortunately, Claude Code paused registrations due to high traffic load. However, both documentation and installation methods reveal it's built on Node.JS and distributed as an NPM package. Though the code repository isn't open source, JavaScript development means: NO SECRETS!
+但是可惜从下午开始 Claude Code 就因为负载过高暂停注册。不过从文档和安装方式上都可以看出 Claude Code 基于 Node.JS 开发，以 NPM package 的形式发布。虽然对应的代码仓库中没有开源代码，但是用 JS 开发就意味着——没有秘密！
 
-While Claude Code's uglified code can't be directly fed into LLM context, this repo demonstrates how we reverse-engineered it step-by-step using LLMs with some techniques. More importantly, these methods apply to reversing other JS code too.
+当然 Claude Code 打包并 Uglify 之后的代码没法直接传入 LLM context 中，所以在这个 Repo 中你会看到我们如何一步步用 LLM + 一点点技巧完成 Claude Code 的源代码逆向分析，进一步从 LLM 中获取你所想知道 Claude Code 设计与代码细节。更重要的是这里面的方法也适用于逆向其他 JS 代码。
 
-- If you wish to use the reverse-engineered code directly for question answering, please read the "How to Use" section.
-- If you wish to see the effects of the reverse engineering, please read the "Question Answering Examples" section.
-- If you wish to understand the reverse engineering methods and details, please read the "Implementation Details" section.
+- 如果你希望直接使用逆向之后的代码进行问答，请阅读「如何使用」章节。
+- 如果你希望查看逆向之后的效果，请阅读「问答示例」章节。
+- 如果你希望了解逆向的方法与细节，请阅读「实现细节」章节。
 
-## How to Use
+## 如何使用
 
-First ensure [Node.JS](https://nodejs.org/en) and [yarn](https://classic.yarnpkg.com/) are installed.
+首先确保你的环境中安装了 [Node.JS](https://nodejs.org/en) 和 [yarn](https://classic.yarnpkg.com/)。
 
-Install dependencies:
+安装依赖：
 
 ```shell
 yarn
 ```
 
-Add `GOOGLE_GENERATIVE_AI_API_KEY`:
+添加 `GOOGLE_GENERATIVE_AI_API_KEY` API key 以使用 Gemini API。
 
 ```shell
 export GOOGLE_GENERATIVE_AI_API_KEY=...
 ```
 
-### Using Other LLMs
+### 使用其他 LLM
 
-Modify [llm.js](./scripts/llm.js) to use other Vercel AI SDK supported providers.
+你可以在 [llm.js](./scripts/llm.js) 使用其他的 Vercel AI SDK 支持的 provider。
 
-### Ask Questions
+### 提问
 
 ```shell
 node scripts/ask.js
 ```
 
-Enter questions in CLI. The LLM will analyze reversed code to answer.
+运行之后，请在 CLI 中输入你的问题，回车后 LLM 将开始从逆向后的代码中分析并给出你想要的答案。
 
-If you are not satisfied with the results, you can also refer to the "Implementation Details" section and improve from a certain step in the middle.
+如果对结果不满意，你也可以参考「实现细节」章节，从中间的某一步开始进行改进。
 
-## Question Answering Examples
+## 问答示例
 
 <details>
 
-<summary>Provide a comprehensive overview of Claude Code's code architecture</summary>
+<summary>完整梳理一下 Claude Code 的代码架构</summary>
 
 Based on the provided code fragment, here's a breakdown of the Claude Code architecture, focusing on prompt design, LLM calling, and related logic:
 
@@ -202,7 +202,8 @@ In summary, this code fragment reveals a sophisticated architecture for interact
 </details>
 
 <details>
-<summary>What system prompts are defined in Claude Code?</summary>
+
+<summary>Claude Code 中定义了哪些 system prompt</summary>
 
 Based on the provided code, here's what I can tell you about the Claude Code CLI program, focusing on aspects relevant to prompt design, LLM calling, and related logic:
 
@@ -339,7 +340,8 @@ This analysis should give you a solid foundation for understanding the Claude Co
 </details>
 
 <details>
-<summary>How does the /compact command work?</summary>
+
+<summary>/compact 指令是怎么工作的</summary>
 
 Based on the provided code, here's an analysis of how the /compact instruction works, focusing on prompt design, LLM calling, and related logic:
 
@@ -412,7 +414,8 @@ Post-Processing and Context Update:
 </details>
 
 <details>
-<summary>Why does Claude Code depend on aws-sdk?</summary>
+
+<summary>Claude Code 为什么会依赖 aws-sdk</summary>
 
 Based on the provided code and the insights from previous code fragments, here's what I can tell you about Claude Code's dependency on aws-sdk:
 
@@ -484,13 +487,13 @@ In summary, this code fragment provides further evidence that Claude Code intera
 
 </details>
 
-## Implementation Details
+## 实现细节
 
-### Initial Attempt
+### 首次尝试
 
-After executing `npm install -g @anthropic-ai/claude-code` as per the documentation, the `@anthropic-ai/claude-code` NPM package is saved locally. The location varies depending on your Node.js installation method.
+在按照文档执行 `npm install -g @anthropic-ai/claude-code` 之后，`@anthropic-ai/claude-code` 的 NPM 包会保存到本地，根据你的 Node.js 安装方式不同，位置也略有不同。
 
-Navigating to the NPM package folder reveals the following contents:
+进入 NPM 包文件夹，包含的内容如下：
 
 ```
 ├── LICENSE.md
@@ -502,136 +505,136 @@ Navigating to the NPM package folder reveals the following contents:
 └── yoga.wasm // Ink(the React-based CLI framework)'s layout engine
 ```
 
-Our task is "simple": analyze the single file `cli.mjs`.
+我们的任务非常「简单」，只需要分析 `cli.mjs` 这一个文件即可。
 
-However, there are challenges:
+但问题是：
 
--   All code is processed by [uglify](<https://en.wikipedia.org/wiki/Minification_(programming)>), making it largely unreadable.
--   The file is 4.6MB. Attempts to directly analyze it with ChatGPT, Gemini, or Claude resulted in either warnings about excessive content length or UI freezes.
+- 所有的代码都经过 [uglify](<https://en.wikipedia.org/wiki/Minification_(programming)>) 处理，使得代码已经不太可读。
+- 文件有 4.6MB 大，我尝试放入 ChatGPT、Gemini、Claude 直接分析，有的提示我内容过长，有的则直接将 UI 界面卡住。
 
-Without LLMs, reverse-engineering the details of such large codebases often takes weeks. With LLM assistance, we can complete this task within an hour, with better results.
+没有 LLM 时，逆向分析这样巨大的代码中的细节，往往需要数周的时间，但在 LLM 的帮助下，我们会在一小时内完成这项工作，并且结果比以往更好。
 
-The idea of [using LLMs for reverse engineering](https://thejunkland.com/blog/using-llms-to-reverse-javascript-minification) is not new, but conducting this experiment on Claude Code (code tool developed by the AI company most proficient in code) is worthwhile to implement step by step from scratch.
+[使用 LLM 进行逆向的思路](https://thejunkland.com/blog/using-llms-to-reverse-javascript-minification)并不新鲜，但考虑到能在 Claude Code（最会写代码的 AI 公司开发的代码工具）进行这项实验，还是值得我们从零开始一步步实现一遍。
 
-Before starting, remember our approach: LLMs possess strong "lossy compression/decompression" capabilities. Our task is to correct some of the lost information and produce the final, accurate result.
+在正式开始之前记住我们的思路：LLM 具有极强的「有损压缩/解压缩」能力，而我们要做的是从它损失的部分中做一点纠正，完成最终的正确结果。
 
-### Code Splitting
+### 分割代码
 
-Anthropic obviously did not write every line of the 4.6MB minified `cli.mjs`. This file includes all its external dependencies.
+显然 Anthropic 没有开发 `cli.mjs` 4.6MB 压缩后代码中的每一行，这个代码文件还包含了它的所有外部依赖代码。
 
-We first beautify the code using [js-beautify](https://github.com/beautifier/js-beautify). This adds indentation and line breaks, which, while not greatly improving readability, separates code blocks.
+我们首先使用 [js-beautify](https://github.com/beautifier/js-beautify) 将代码进行美化，它的作用是为代码添加缩进、换行，虽然不能提升多少可读性，但是能让代码区块更分离。
 
-The beautified [cli.beautify.mjs](./cli.beautify.mjs) contains 190,000 lines of code. Our first step is to separate the external dependencies, as their functionality is documented publicly. Our focus is on the non-open-source code of Claude Code.
+美化之后的 [cli.beautify.mjs](./cli.beautify.mjs) 有多达 19 万行代码。我们首先要做的是从这些代码中分离出外部依赖代码，因为他们的功能我们可以通过公开的文档了解，逆向分析的重点是 Claude Code 未开源的代码。
 
-Here, I started using LLMs to identify external dependencies. These dependencies (e.g., React) are well-known to LLMs, so I assumed they could reverse-identify them from the uglified version through code behavior patterns.
+在这里我开始使用 LLM，让它识别代码中的外部依赖。这些外部依赖（比如 React）对于 LLM 来说是十分熟悉的知识，因此我认为它有从 uglify 之后的版本通过一些代码行为特征反向识别它们的能力。
 
-Before that, we need to split the single file into small chunks that fit into the LLM context.
+但在此之前，我们还是需要把单个代码文件切分为 LLM context 可以容纳的那小。
 
-I used [acorn](https://github.com/acornjs/acorn/tree/master/acorn/) to parse the JS file, splitting it by top-level scope code block ASTs (e.g., `FunctionDeclaration`, `ExportNamedDeclaration`, ...). Initially, I split each AST into a separate chunk, but this proved ineffective. For example, React code would be split into dozens of AST chunks, none of which had enough features for LLMs to recognize it. I then switched to length-based splitting, creating a chunk when the cumulative string length of multiple AST chunks exceeded `100_000`.
+在这里我使用了 [acorn](https://github.com/acornjs/acorn/tree/master/acorn/) 解析 JS 文件，按照 top-level scope 中的代码 block AST（例如 `FunctionDeclaration`, `ExportNamedDeclaration`, ...）进行分割。起初我选择每个 AST 一个代码分割文件（chunk），但后来发现这样并不好，同样以 React 为例，一份 React 代码可能被切分为数十个 AST chunk，这导致任何一个 chunk 都不具备足够的特征让 LLM 认出它。之后我改为了按照长度切分，当多个 AST chunk 的字符串长度累加超过 `100_000` 时进行一次切分。
 
-> If you want to try this yourself, adjust this threshold and observe the differences in recognition.
+> 如果你想自己动手试试。可以调整这个阈值，观察识别效果的差异。
 
-The splitting code is in [split.js](./scripts/split.js), and the output is in the [chunks](./chunks/) directory as `chunks.$num.mjs` files.
+切分的代码在 [split.js](./scripts/split.js) 中，切分的产物是 [chunks](./chunks/) 目录中的 `chunks.$num.mjs` 文件。
 
-### Identifying External Dependencies
+### 识别外部依赖
 
-After splitting, each chunk can be placed in the LLM context. I wrote a simple LLM invocation script, [learn-chunks.js](./scripts/learn-chunks.js), to have the LLM identify the chunk's content and return two pieces of information:
+切分之后，每个 chunk 都可以放入 LLM context 中，我们编写了一个简单的 LLM 调用脚本 [learn-chunks.js](./scripts/learn-chunks.js) 让 LLM 识别 chunk 的内容，并返回两个信息：
 
-1.  The corresponding open-source project name.
-2.  The code's purpose.
+1. 代码中对应的开源项目名称
+2. 代码的意图
 
-The results are in the [chunks](./chunks/) directory as `chunks.$num.json` files.
+识别的结果在 [chunks](./chunks/) 目录中的 `chunks.$num.json` 文件中。
 
-We also generated a [chunks.index.json](./chunks/chunks.index.json) index file to record the mapping between AST block names and chunk files.
+我们还额外生成了一个 [chunks.index.json](./chunks/chunks.index.json) 索引文件，用于记录每个 chunk 文件中 AST block 名称与 chunk 文件的映射关系。
 
-At this stage, the LLM extracted the following open-source projects from all chunks:
+在这个阶段，LLM 从所有 chunk 中提取出了以下开源项目：
 
 ```
 [
- 'Sentry',
- 'web-streams-polyfill',
- 'node-fetch',
- 'undici',
- 'React',
- 'ws',
- 'React DevTools',
- 'rxjs',
- 'aws-sdk-js-v3',
- '@aws-sdk/signature-v4',
- '@smithy/smithy-client',
- 'googleapis/gaxios',
- 'uuid',
- 'google-auth-library-nodejs',
- 'highlight.js',
- 'dotenv',
- 'jsdom',
- 'Fabric.js',
- 'htmlparser2',
- 'sentry-javascript',
- 'sharp',
- 'commander.js',
- 'yoga',
- 'Ink',
- 'Yoga',
- 'ink',
- 'vscode',
- 'npm',
- 'Claude-code',
- 'AWS SDK for Javascript',
- 'LangChain.js',
- 'Zod',
- 'Claude Code',
- 'Continue Code',
- 'Tengu',
- 'Marked.js',
- '@anthropic-ai/claude-code',
- 'claude-code',
- 'statsig-js',
- 'Statsig',
- 'icu4x'
+  'Sentry',
+  'web-streams-polyfill',
+  'node-fetch',
+  'undici',
+  'React',
+  'ws',
+  'React DevTools',
+  'rxjs',
+  'aws-sdk-js-v3',
+  '@aws-sdk/signature-v4',
+  '@smithy/smithy-client',
+  'googleapis/gaxios',
+  'uuid',
+  'google-auth-library-nodejs',
+  'highlight.js',
+  'dotenv',
+  'jsdom',
+  'Fabric.js',
+  'htmlparser2',
+  'sentry-javascript',
+  'sharp',
+  'commander.js',
+  'yoga',
+  'Ink',
+  'Yoga',
+  'ink',
+  'vscode',
+  'npm',
+  'Claude-code',
+  'AWS SDK for Javascript',
+  'LangChain.js',
+  'Zod',
+  'Claude Code',
+  'Continue Code',
+  'Tengu',
+  'Marked.js',
+  '@anthropic-ai/claude-code',
+  'claude-code',
+  'statsig-js',
+  'Statsig',
+  'icu4x'
 ]
 ```
 
-Some may be unfamiliar (e.g., Tengu), and some may seem counterintuitive (e.g., LangChain.js). This is where we need human intervention for review and correction.
+有一些你很可能没有见过（例如 Tengu），有一些你觉得不符合直觉（例如 LangChain.js），这就是我们需要人为介入，做一些审查与纠错的阶段了。
 
-### Human Correction and Re-Merging
+### 人为纠错与重新合并
 
-I did not audit all recognition results, as some were obviously correct (e.g., React, Ink), and others were unreasonable but inconsequential (e.g., vscode, Fabric.js). I focused on reviewing recognition results that were unreasonable and relevant to Claude Code's core functionality, also correcting some inconsistent capitalization.
+实际上我没有审计所有的识别结果，因为有的显然正确（例如 React、Ink），有的不合理但无关紧要（例如 vscode、Farbic.js），我将重点放在了与 Claude Code 核心功能相关且不合理的识别结果审查上，顺带纠正了几个大小写不统一的问题。
 
-My audit resulted in a renaming map:
+我的审计结果最终体现为一个用于重命名的映射：
 
 ```js
 {
- "sentry-javascript": "sentry",
- "react devtools": "react",
- "aws-sdk-js-v3": "aws-sdk",
- "@aws-sdk/signature-v4": "aws-sdk",
- "@smithy/smithy-client": "aws-sdk",
- "aws sdk for javascript": "aws-sdk",
- "statsig-js": "statsig",
- "claude-code": "claude-code-1",
- "langchain.js": 'claude-code-2',
- zod: 'claude-code-3',
- "claude code": "claude-code-4",
- "continue code": "claude-code-5",
- tengu: "claude-code-5",
- "@anthropic-ai/claude-code": "claude-code-6",
+  "sentry-javascript": "sentry",
+  "react devtools": "react",
+  "aws-sdk-js-v3": "aws-sdk",
+  "@aws-sdk/signature-v4": "aws-sdk",
+  "@smithy/smithy-client": "aws-sdk",
+  "aws sdk for javascript": "aws-sdk",
+  "statsig-js": "statsig",
+  "claude-code": "claude-code-1",
+  "langchain.js": 'claude-code-2',
+  zod: 'claude-code-3',
+  "claude code": "claude-code-4",
+  "continue code": "claude-code-5",
+  tengu: "claude-code-5",
+  "@anthropic-ai/claude-code": "claude-code-6",
 }[lowerCaseProject] || lowerCaseProject
 ```
 
-Here, we mapped Claude Code related code to six names: `claude-code-1` to `claude-code-6`. This is because merging these six chunk types would again exceed the LLM context limit.
+这里我们将 Claude Code 相关的代码映射到了 `claude-code-1` ~ `claude-code-6` 6 个命名中，是因为如果将它们 6 类 chunk 再次合并到一起，又会超过 LLM context 的上限。
 
-After correction, we re-merged the code related to the same project based on the recognition results. The results are stored in the [merged-chunks](./merged-chunks/) directory as `$project.mjs` files. This process inevitably involves issues like chunk boundaries spanning two projects, but LLMs excel at ignoring such boundary cases.
+纠错之后，我们按照识别结果重新将同一个项目相关的代码按项目进行合并，结果保存在 [merged-chunks](./merged-chunks/) 目录的 `$project.mjs` 文件中。这个过程肯定存在 chunk 的边界跨越两个项目之类的问题，但 LLM 很擅长忽略这些边界情况。
 
-During merging, we also generated a [chunks.index.json](./merged-chunks/chunks.index.json) index file, recording the mapping between `chunks.$num.json` and project names.
+合并时我们同样生成了 [chunks.index.json](./merged-chunks/chunks.index.json) 索引文件，记录 `chunks.$num.json` 与项目名称的映射关系。
 
-The merging code is implemented in [merge-again.js](./scripts/merge-again.js).
+合并的代码实现在 [merge-again.js](./scripts/merge-again.js) 中。
 
-### Optimizing Merged Claude Code Code
+### 优化合并后的 Claude Code 代码
 
-After merging, we have six fragments of Claude Code. These fragments can now be placed in the LLM context for further processing. However, each fragment contains numerous unreadable variable names and functions defined in external code, which might hinder LLM understanding.
+在合并之后，我们得到了 Claude Code 代码的 6 个碎片，这些代码已经可以放入 LLM context 中进行下一步处理，但考虑到切分之后每个代码碎片中都包含大量命名不可读的变量、函数是定义在外部代码中的，这可能会让 LLM 的理解结果不及预期。
 
-Therefore, we used Acorn again to roughly identify undefined variable names in the Claude Code fragments and queried the corresponding variables' origin through the two-layer index file. This allowed us to add comments like this to the top of the Claude Code fragments:
+所以我们再次使用 acorn 粗略识别了 Claude Code 代码碎片中的未定义变量名，并通过两层索引文件查询对应的变量是从哪个外部依赖中引入的。这让我们可以在 Claude Code 碎片顶部添加这样的注释：
 
 ```js
 /* Some variables in the code import from the following projects
@@ -640,13 +643,13 @@ Therefore, we used Acorn again to roughly identify undefined variable names in t
  */
 ```
 
-I believe this provides some insight for LLMs to understand code behavior.
+我详细这对 LLM 理解代码行为会有一些启发。
 
-The implementation of this optimization process is in [improve-merged-chunks.js](./scripts/improve-merged-chunks.js).
+这一优化过程的实现在 [improve-merged-chunks.js](./scripts/improve-merged-chunks.js) 中。
 
-### Collecting Answers from Multiple Code Fragments
+### 在多个代码碎片中收集答案
 
-Finally, we can start asking questions. However, the answers we seek might exist in one or more of the six Claude Code fragments. Since the LLM context cannot simultaneously accommodate all six fragments, I chose to ask each fragment sequentially, accumulating the information collected by the LLM from previous fragments into the context of the next fragment. By the sixth fragment, our context looked like this:
+终于，我们可以开始问答了。但我们想知道的答案可能存在于 Claude Code 6 个代码碎片的 1 个或多个中，LLM context 又不能同时容纳 6 个代码碎片，所以我选择将问题依次提给每一个代码碎片，并将 LLM 在之前代码碎片中收集到的信息累积到下一个碎片的提问上下文中，到第 6 个碎片时，我们的上下文变成了这样：
 
 ```xml
 <system_prompt></system_prompt>
@@ -654,16 +657,16 @@ Finally, we can start asking questions. However, the answers we seek might exist
 <focus_question></focus_question>
 
 <insight_from_other_code_fragment>
- <insight_from_1><insight_from_1>
- <insight_from_2><insight_from_2>
- <insight_from_3><insight_from_3>
- <insight_from_4><insight_from_4>
- <insight_from_5><insight_from_5>
+  <insight_from_1><insight_from_1>
+  <insight_from_2><insight_from_2>
+  <insight_from_3><insight_from_3>
+  <insight_from_4><insight_from_4>
+  <insight_from_5><insight_from_5>
 </insight_from_other_code_fragment>
 
 <current_code_fragment></current_code_fragment>
 ```
 
-Essentially, we compressed each code fragment into text information more relevant to the current question, allowing the LLM context to ultimately accommodate relevant content spanning multiple code fragments.
+可以理解为我们把每个代码碎片压缩为了与当前问题更相关的文本信息，使 LLM context 最终容纳了跨越多个代码碎片的相关内容。
 
-Finally, we obtained reverse-engineering results capable of achieving the level of detail shown in the "Question Answering Examples" section.
+最终我们就得到了能够完成「问答示例」章节中所展现出的细节水平的逆向分析结果。

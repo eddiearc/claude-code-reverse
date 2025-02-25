@@ -42,7 +42,7 @@ for (const chunk of fs.readdirSync(chunksDir)) {
     continue;
   }
 
-  const { ossProjects = [], purpose } = JSON.parse(
+  const { ossProjects = [] } = JSON.parse(
     fs.readFileSync(chunkPath, "utf-8")
   );
 
