@@ -10,6 +10,9 @@ Anthropic 发布 [Claude Code](https://www.anthropic.com/news/claude-3-7-sonnet)
 - 如果你希望查看逆向之后的效果，请阅读「问答示例」章节。
 - 如果你希望了解逆向的方法与细节，请阅读「实现细节」章节。
 
+> https://github.com/dnakov/claude-code
+> 如果对 Claude Code 的真实源代码更感兴趣，可以查看这个基于 source map 还原出来的 Repo。
+
 ## 如何使用
 
 首先确保你的环境中安装了 [Node.JS](https://nodejs.org/en) 和 [yarn](https://classic.yarnpkg.com/)。

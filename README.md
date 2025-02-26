@@ -12,6 +12,9 @@ While Claude Code's uglified code can't be directly fed into LLM context, this r
 - If you wish to see the effects of the reverse engineering, please read the "Question Answering Examples" section.
 - If you wish to understand the reverse engineering methods and details, please read the "Implementation Details" section.
 
+> https://github.com/dnakov/claude-code
+> If you are more interested in the real source code of Claude Code, you can check out this Repo restored based on the source map.
+
 ## How to Use
 
 First ensure [Node.JS](https://nodejs.org/en) and [yarn](https://classic.yarnpkg.com/) are installed.
