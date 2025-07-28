@@ -1,5 +1,7 @@
 # Claude Code Reverse Engineering: New Version (July 2025)
 
+[中文版](./README.zh_CN.md)
+
 **🚀 Quick Try**: Experience the reverse engineering analysis results through our interactive visualization tool at [https://yuyz0112.github.io/claude-code-reverse/visualize.html](https://yuyz0112.github.io/claude-code-reverse/visualize.html)
 
 When Anthropic released Claude Code (February 2025), I couldn't try it directly because registrations were paused due to high load. So, I implemented a solution to reverse engineer static code using LLMs, which became the first version of this repository. The code for the initial version is currently archived in the [v1](./v1) directory.
@@ -118,6 +120,8 @@ It uses the Sonnet 4 model.
 When Claude Code is used within an IDE environment, it reads the paths of currently open files to provide more context for the conversation.
 
 These file paths are then incorporated into the [IDE open file prompt](./results/prompts/ide-opened-file.prompt.md).
+
+TODO: In the IDE integration state, Claude Code will also register some IDE-specific tools through MCP, such as obtaining error message in the IDE, executing code, etc., to be analyzed.
 
 ### Todo Short-Term Memory Management
 

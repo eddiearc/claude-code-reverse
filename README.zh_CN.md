@@ -116,6 +116,8 @@ prompts 与 tools 的设计中都有不少亮点和值得学习的细节，自�
 
 文件地址会被放入 [IDE open file prompt](./results/prompts/ide-opened-file.prompt.md) 中。
 
+TODO: 在 IDE 集成状态下，Claude Code 还会通过 MCP 注册一些 IDE 专用的 tools，例如获取 IDE 中的错误信息、执行代码等，待分析。
+
 ### Todo 短时记忆管理
 
 在 [system workflow prompt](./results/prompts/system-workflow.prompt.md) 的「Task Management」章节中，定义了基于 TodoWrite 工具的任务管理方法。
