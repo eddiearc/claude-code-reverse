@@ -1,5 +1,7 @@
 # Claude Code 逆向工程，2025-07 新版
 
+**🚀 快速体验**: 通过交互式可视化工具体验逆向分析结果：[https://yuyz0112.github.io/claude-code-reverse/visualize.html](https://yuyz0112.github.io/claude-code-reverse/visualize.html)
+
 在 Anthropic 发布 Claude Code（2025 年 2 月），因为当时负载过高暂停注册，无法直接体验，所以我实现了一套使用 LLM 逆向分析静态代码的方案，也就是这个仓库的第一版。
 目前第一版的代码归档在了 [v1](./v1) 目录下。
 

@@ -1,5 +1,7 @@
 # Claude Code Reverse Engineering: New Version (July 2025)
 
+**🚀 Quick Try**: Experience the reverse engineering analysis results through our interactive visualization tool at [https://yuyz0112.github.io/claude-code-reverse/visualize.html](https://yuyz0112.github.io/claude-code-reverse/visualize.html)
+
 When Anthropic released Claude Code (February 2025), I couldn't try it directly because registrations were paused due to high load. So, I implemented a solution to reverse engineer static code using LLMs, which became the first version of this repository. The code for the initial version is currently archived in the [v1](./v1) directory.
 
 > At the time, there was another version by someone else that directly restored the source code based on sourcemaps. However, that repository was later taken down, indicating that Anthropic officially does not support this type of reverse engineering.
