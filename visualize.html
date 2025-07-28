@@ -406,7 +406,7 @@
     <div class="topbar">
       <a href="https://github.com/Yuyz0112/claude-code-reverse" target="_blank" class="pill"
         style="text-decoration: none; margin-right: 12px;">
-        Github Repo
+        How It Works
       </a>
       <label class="file-btn">
         <input id="fileInput" type="file" accept=".log,.txt,text/plain" hidden />
@@ -972,10 +972,10 @@
     async function loadLogFiles() {
       try {
         const logFiles = ['basic.log', 'compact.log', 'sub-agent.log', 'summarize.log'];
-        
+
         // Clear existing options except the first one
         exampleSelect.innerHTML = '<option value="">Choose example</option>';
-        
+
         // Add options for each log file
         logFiles.forEach(filename => {
           const option = document.createElement('option');
@@ -990,7 +990,7 @@
 
     async function loadExample(filename) {
       if (!filename) return;
-      
+
       try {
         const response = await fetch(`./logs/${filename}`);
         if (!response.ok) throw new Error(`Failed to load ${filename}`);
