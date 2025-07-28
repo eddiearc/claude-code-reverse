@@ -412,9 +412,9 @@
         <input id="fileInput" type="file" accept=".log,.txt,text/plain" hidden />
         <span>Choose conversation log</span>
       </label>
-      <button id="loadExampleBtn" class="file-btn" style="margin-left: 8px;">
-        Load Example
-      </button>
+      <select id="exampleSelect" class="file-btn" style="margin-left: 8px;">
+        <option value="">Choose example</option>
+      </select>
       <span id="fileName" class="file-name">No file chosen</span>
       <span id="metaInfo" class="hint"></span>
     </div>
@@ -498,7 +498,7 @@
     // -------- Element refs --------
     const el = id => document.getElementById(id);
     const fileInput = el('fileInput');
-    const loadExampleBtn = el('loadExampleBtn');
+    const exampleSelect = el('exampleSelect');
     const fileNameEl = el('fileName');
     const metaInfoEl = el('metaInfo');
     const toolsList = el('toolsList');
@@ -968,11 +968,32 @@
       if (e.key === 'ArrowRight') nextBtn.click();
     });
 
-    // -------- Load example helper --------
-    async function loadExample() {
+    // -------- Load example helpers --------
+    async function loadLogFiles() {
       try {
-        const response = await fetch('./logs/basic.log');
-        if (!response.ok) throw new Error('Failed to load example');
+        const logFiles = ['basic.log', 'compact.log', 'sub-agent.log', 'summarize.log'];
+        
+        // Clear existing options except the first one
+        exampleSelect.innerHTML = '<option value="">Choose example</option>';
+        
+        // Add options for each log file
+        logFiles.forEach(filename => {
+          const option = document.createElement('option');
+          option.value = filename;
+          option.textContent = filename;
+          exampleSelect.appendChild(option);
+        });
+      } catch (err) {
+        console.error('Failed to populate log files:', err);
+      }
+    }
+
+    async function loadExample(filename) {
+      if (!filename) return;
+      
+      try {
+        const response = await fetch(`./logs/${filename}`);
+        if (!response.ok) throw new Error(`Failed to load ${filename}`);
         const text = await response.text();
 
         if (typeof window.parseConversationLog !== 'function') {
@@ -987,12 +1008,13 @@
         renderSystemPrompts();
 
         const total = (json.conversations || []).length;
-        fileNameEl.textContent = 'basic.log (example)';
+        fileNameEl.textContent = `${filename} (example)`;
         metaInfoEl.textContent = `Conversations: ${total}`;
 
         setIndex(0);
       } catch (err) {
         alert('Failed to load example: ' + (err?.message || err));
+        exampleSelect.value = ''; // Reset selection on error
       }
     }
 
@@ -1027,9 +1049,12 @@
       }
     });
 
-    loadExampleBtn.addEventListener('click', loadExample);
+    exampleSelect.addEventListener('change', (e) => {
+      loadExample(e.target.value);
+    });
 
-    // Initial empty states
+    // Initialize log files options and empty states
+    loadLogFiles();
     renderTools(); renderSystemPrompts();
   </script>
 </body>
