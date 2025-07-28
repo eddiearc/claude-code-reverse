@@ -11,7 +11,10 @@ Anthropic 发布 [Claude Code](https://www.anthropic.com/news/claude-3-7-sonnet)
 - 如果你希望了解逆向的方法与细节，请阅读「实现细节」章节。
 
 > https://github.com/dnakov/claude-code
+>
 > 如果对 Claude Code 的真实源代码更感兴趣，可以查看这个基于 source map 还原出来的 Repo。
+
+> [B 站讲解视频](https://www.bilibili.com/video/BV1cKPjeUEPN/)
 
 ## 如何使用
 
@@ -31,7 +34,7 @@ export GOOGLE_GENERATIVE_AI_API_KEY=...
 
 ### 使用其他 LLM
 
-你可以在 [llm.js](./scripts/llm.js) 使用其他的 Vercel AI SDK 支持的 provider。
+你可以在 [llm.js](https://github.com/Yuyz0112/claude-code-reverse/blob/main/scripts/llm.js) 使用其他的 Vercel AI SDK 支持的 provider。
 
 ### 提问
 
@@ -527,7 +530,7 @@ In summary, this code fragment provides further evidence that Claude Code intera
 
 我们首先使用 [js-beautify](https://github.com/beautifier/js-beautify) 将代码进行美化，它的作用是为代码添加缩进、换行，虽然不能提升多少可读性，但是能让代码区块更分离。
 
-美化之后的 [cli.beautify.mjs](./cli.beautify.mjs) 有多达 19 万行代码。我们首先要做的是从这些代码中分离出外部依赖代码，因为他们的功能我们可以通过公开的文档了解，逆向分析的重点是 Claude Code 未开源的代码。
+美化之后的 [cli.beautify.mjs](https://github.com/Yuyz0112/claude-code-reverse/blob/main/cli.beautify.mjs) 有多达 19 万行代码。我们首先要做的是从这些代码中分离出外部依赖代码，因为他们的功能我们可以通过公开的文档了解，逆向分析的重点是 Claude Code 未开源的代码。
 
 在这里我开始使用 LLM，让它识别代码中的外部依赖。这些外部依赖（比如 React）对于 LLM 来说是十分熟悉的知识，因此我认为它有从 uglify 之后的版本通过一些代码行为特征反向识别它们的能力。
 
@@ -537,18 +540,18 @@ In summary, this code fragment provides further evidence that Claude Code intera
 
 > 如果你想自己动手试试。可以调整这个阈值，观察识别效果的差异。
 
-切分的代码在 [split.js](./scripts/split.js) 中，切分的产物是 [chunks](./chunks/) 目录中的 `chunks.$num.mjs` 文件。
+切分的代码在 [split.js](https://github.com/Yuyz0112/claude-code-reverse/blob/main/scripts/split.js) 中，切分的产物是 [chunks](https://github.com/Yuyz0112/claude-code-reverse/blob/main/chunks/) 目录中的 `chunks.$num.mjs` 文件。
 
 ### 识别外部依赖
 
-切分之后，每个 chunk 都可以放入 LLM context 中，我们编写了一个简单的 LLM 调用脚本 [learn-chunks.js](./scripts/learn-chunks.js) 让 LLM 识别 chunk 的内容，并返回两个信息：
+切分之后，每个 chunk 都可以放入 LLM context 中，我们编写了一个简单的 LLM 调用脚本 [learn-chunks.js](https://github.com/Yuyz0112/claude-code-reverse/blob/main/scripts/learn-chunks.js) 让 LLM 识别 chunk 的内容，并返回两个信息：
 
 1. 代码中对应的开源项目名称
 2. 代码的意图
 
-识别的结果在 [chunks](./chunks/) 目录中的 `chunks.$num.json` 文件中。
+识别的结果在 [chunks](https://github.com/Yuyz0112/claude-code-reverse/blob/main/chunks/) 目录中的 `chunks.$num.json` 文件中。
 
-我们还额外生成了一个 [chunks.index.json](./chunks/chunks.index.json) 索引文件，用于记录每个 chunk 文件中 AST block 名称与 chunk 文件的映射关系。
+我们还额外生成了一个 [chunks.index.json](https://github.com/Yuyz0112/claude-code-reverse/blob/main/chunks/chunks.index.json) 索引文件，用于记录每个 chunk 文件中 AST block 名称与 chunk 文件的映射关系。
 
 在这个阶段，LLM 从所有 chunk 中提取出了以下开源项目：
 
@@ -627,11 +630,11 @@ In summary, this code fragment provides further evidence that Claude Code intera
 
 这里我们将 Claude Code 相关的代码映射到了 `claude-code-1` ~ `claude-code-6` 6 个命名中，是因为如果将它们 6 类 chunk 再次合并到一起，又会超过 LLM context 的上限。
 
-纠错之后，我们按照识别结果重新将同一个项目相关的代码按项目进行合并，结果保存在 [merged-chunks](./merged-chunks/) 目录的 `$project.mjs` 文件中。这个过程肯定存在 chunk 的边界跨越两个项目之类的问题，但 LLM 很擅长忽略这些边界情况。
+纠错之后，我们按照识别结果重新将同一个项目相关的代码按项目进行合并，结果保存在 [merged-chunks](https://github.com/Yuyz0112/claude-code-reverse/blob/main/merged-chunks/) 目录的 `$project.mjs` 文件中。这个过程肯定存在 chunk 的边界跨越两个项目之类的问题，但 LLM 很擅长忽略这些边界情况。
 
-合并时我们同样生成了 [chunks.index.json](./merged-chunks/chunks.index.json) 索引文件，记录 `chunks.$num.json` 与项目名称的映射关系。
+合并时我们同样生成了 [chunks.index.json](https://github.com/Yuyz0112/claude-code-reverse/blob/main/merged-chunks/chunks.index.json) 索引文件，记录 `chunks.$num.json` 与项目名称的映射关系。
 
-合并的代码实现在 [merge-again.js](./scripts/merge-again.js) 中。
+合并的代码实现在 [merge-again.js](https://github.com/Yuyz0112/claude-code-reverse/blob/main/scripts/merge-again.js) 中。
 
 ### 优化合并后的 Claude Code 代码
 
@@ -648,7 +651,7 @@ In summary, this code fragment provides further evidence that Claude Code intera
 
 我详细这对 LLM 理解代码行为会有一些启发。
 
-这一优化过程的实现在 [improve-merged-chunks.js](./scripts/improve-merged-chunks.js) 中。
+这一优化过程的实现在 [improve-merged-chunks.js](https://github.com/Yuyz0112/claude-code-reverse/blob/main/scripts/improve-merged-chunks.js) 中。
 
 ### 在多个代码碎片中收集答案
 
