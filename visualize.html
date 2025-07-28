@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8" />
-  <title>LLM Results Viewer</title>
+  <title>Claude Code Reverse Engineering Log Viewer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <!-- Markdown render + sanitize -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -404,10 +404,17 @@
 <body>
   <div class="container">
     <div class="topbar">
+      <a href="https://github.com/Yuyz0112/claude-code-reverse" target="_blank" class="pill"
+        style="text-decoration: none; margin-right: 12px;">
+        Github Repo
+      </a>
       <label class="file-btn">
         <input id="fileInput" type="file" accept=".log,.txt,text/plain" hidden />
         <span>Choose conversation log</span>
       </label>
+      <button id="loadExampleBtn" class="file-btn" style="margin-left: 8px;">
+        Load Example
+      </button>
       <span id="fileName" class="file-name">No file chosen</span>
       <span id="metaInfo" class="hint"></span>
     </div>
@@ -491,6 +498,7 @@
     // -------- Element refs --------
     const el = id => document.getElementById(id);
     const fileInput = el('fileInput');
+    const loadExampleBtn = el('loadExampleBtn');
     const fileNameEl = el('fileName');
     const metaInfoEl = el('metaInfo');
     const toolsList = el('toolsList');
@@ -960,6 +968,34 @@
       if (e.key === 'ArrowRight') nextBtn.click();
     });
 
+    // -------- Load example helper --------
+    async function loadExample() {
+      try {
+        const response = await fetch('./logs/basic.log');
+        if (!response.ok) throw new Error('Failed to load example');
+        const text = await response.text();
+
+        if (typeof window.parseConversationLog !== 'function') {
+          throw new Error('parser.js is missing parseConversationLog(logString)');
+        }
+
+        const json = window.parseConversationLog(text);
+
+        state.data = json;
+        buildMaps(json);
+        renderTools();
+        renderSystemPrompts();
+
+        const total = (json.conversations || []).length;
+        fileNameEl.textContent = 'basic.log (example)';
+        metaInfoEl.textContent = `Conversations: ${total}`;
+
+        setIndex(0);
+      } catch (err) {
+        alert('Failed to load example: ' + (err?.message || err));
+      }
+    }
+
     // -------- File handling --------
     fileInput.addEventListener('change', async (e) => {
       const file = e.target.files?.[0];
@@ -990,6 +1026,8 @@
         alert('Failed to parse: ' + (err?.message || err));
       }
     });
+
+    loadExampleBtn.addEventListener('click', loadExample);
 
     // Initial empty states
     renderTools(); renderSystemPrompts();
