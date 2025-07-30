@@ -74,8 +74,8 @@ The internal processes of Claude Code that have been reverse-engineered include:
 - Context compaction
 - IDE integration
 - Todo short-term memory management
-- TODO: Task/Sub Agent workflow
-- TODO: Summarize previous conversations
+- Task/Sub Agent workflow
+- Summarize previous conversations
 
 The analyzed prompts are recorded in the [prompts directory](./results/prompts/), and the analyzed tool definitions are recorded in the [tools directory](./results/tools/).
 
@@ -121,7 +121,9 @@ When Claude Code is used within an IDE environment, it reads the paths of curren
 
 These file paths are then incorporated into the [IDE open file prompt](./results/prompts/ide-opened-file.prompt.md).
 
-TODO: In the IDE integration state, Claude Code will also register some IDE-specific tools through MCP, such as obtaining error message in the IDE, executing code, etc., to be analyzed.
+In the IDE integration state, Claude Code will also register some IDE-specific tools through MCP, such as obtaining error information in the IDE, executing code, etc.
+
+You can see in [ide-integration.log](./logs/ide-integration.log) how we guided Claude Code to use IDE tools to fix lint errors in files.
 
 ### Todo Short-Term Memory Management
 
@@ -130,3 +132,23 @@ Within the "Task Management" section of the [system workflow prompt](./results/p
 When `TodoWrite` executes, it actually creates a JSON file in `~/.claude/todos/` to record the Todos from the current conversation, serving as short-term memory. When a Todo is completed, the model also uses this tool to update the JSON file.
 
 As mentioned in the Core Agent Workflow section, the system reminder end prompt dynamically loads the latest Todo list, enabling the model to keep track of its previous progress.
+
+### Task/Sub Agent Workflow
+
+Claude Code designed a Sub Agent system, implemented by loading the [Task Tool](./results/tools/Task.tool.yaml), using prompts to guide the model to initiate a Sub Agent through calling this tool when specific independent tasks need to be executed.
+
+Claude Code's Sub Agent, as a specific form of Multi Agent, has its special design:
+
+1. There's always a concept of Main Agent (the object users initially interact with).
+2. When initiating a Sub Agent, it extracts the task to be processed from the main context and uses it as the initial prompt for the sub context.
+3. After the Sub Agent completes the task, it returns the final result as a tool result to the main context.
+
+This design makes Sub Agent an effective way to optimize main context space. In some independent tasks (such as "finding specific function implementations from the codebase"), multiple rounds of Agent tool call/result interactions generate a lot of context irrelevant to the final required result (such as searching irrelevant files that are excluded by the LLM after reading). Sub Agent can isolate this "dirty context" in the sub context, which disappears when the Sub Agent task is completed, while the main context only retains the small portion of needed results.
+
+### Summarize Previous Conversations
+
+When starting Claude Code, it summarizes previous conversations.
+
+Corresponds to the [Summarize prompt](./results/prompts/summarize-previous-conversation.prompt.md).
+
+It uses the Haiku 3.5 model.

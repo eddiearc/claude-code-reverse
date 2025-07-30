@@ -1,4 +1,4 @@
-# Claude Code 1.0.61
+# Claude Code 1.0.62
 
 --- a/cli.js
 +++ b/cli.js
@@ -137,13 +137,10 @@
 +  return inner;
 +}
 +
- class DP extends o5 {
-   constructor() {
-     super(...arguments);
-     this.completions = new d_(this);
-     this.messages    = new bw(this);
-     this.models      = new zt(this);
-     this.beta        = new qK(this);
+class GP extends t5 {
+    constructor() {
+        super(...arguments);
+        this.completions = new n_(this), this.messages = new hw(this), this.models = new Et(this), this.beta = new qK(this)
 +
 +    // Monkey-patch beta.messages.create for logging
 +    {

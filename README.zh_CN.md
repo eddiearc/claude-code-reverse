@@ -69,8 +69,8 @@ js-beautify cli.bak > cli.js
 - compact
 - IDE 集成
 - Todo 短时记忆管理
-- TODO: Task/Sub Agent 流程
-- TODO: 总结过往对话
+- Task/Sub Agent 流程
+- 总结过往对话
 
 分析出的 prompt 记录在 [prompts 目录](./results/prompts/)，分析出的 tools definitions 记录在 [tools 目录](./results/tools/)。
 
@@ -116,7 +116,9 @@ prompts 与 tools 的设计中都有不少亮点和值得学习的细节，自�
 
 文件地址会被放入 [IDE open file prompt](./results/prompts/ide-opened-file.prompt.md) 中。
 
-TODO: 在 IDE 集成状态下，Claude Code 还会通过 MCP 注册一些 IDE 专用的 tools，例如获取 IDE 中的错误信息、执行代码等，待分析。
+在 IDE 集成状态下，Claude Code 还会通过 MCP 注册一些 IDE 专用的 tools，例如获取 IDE 中的错误信息、执行代码等。
+
+可以在 [ide-integration.log](./logs/ide-integration.log) 中看到我们是如何引导 Claude Code 使用 IDE tools 修复文件中的 lint 错误的。
 
 ### Todo 短时记忆管理
 
@@ -125,3 +127,23 @@ TODO: 在 IDE 集成状态下，Claude Code 还会通过 MCP 注册一些 IDE �
 TodoWrite 执行时会实际向 `~/.claude/todos/` 创建一个 JSON 文件，记录当前对话中的 Todo，作为短时记忆。Todo 完成时，模型也会使用该工具更新 JSON 文件。
 
 在核心 Agent 流程中已经讲到，system reminder end prompt 会实时加载最新的 Todo 列表，促使模型跟随之前的进度。
+
+### Task/Sub Agent 流程
+
+Claude Code 设计了 Sub Agent 系统，实现方式是通过加载 [Task Tool](./results/tools/Task.tool.yaml)，通过提示词引导模型在需要执行特定的独立任务时，可以通过调用该工具，发起一个 Sub Agent。
+
+Claude Code Sub Agent 作为一种 Multi Agent 的具体形态，有它的特殊设计：
+
+1. 始终有 Main Agent 的概念（用户最初交互的对象）。
+2. 发起一个 Sub Agent 时，会从 main context 提取需要处理的任务，作为 sub context 的初始提示词。
+3. Sub Agent 完成任务之后，会将最终结果作为 tool result 返回 main context。
+
+这样的设计让 Sub Agent 成为优化 main context 空间的一种有效方式。因为在一些独立任务中（例如「从代码库中查找特定函数的实现」），在多轮的 Agent tool call/result 中，会产生大量与最终所需结果无关的上下文（例如搜索到了无关的文件，读取后被 LLM 排除）。Sub Agent 可以让这些「脏上下文」被隔离在 sub context 中，随着 Sub Agent 任务完成而消失，而 main context 中只保留需要的一小部分结果。
+
+### 总结过往对话
+
+在启动 Claude Code 时，它会对过往对话进行汇总。
+
+对应 [Summarize 提示词](./results/prompts/summarize-previous-conversation.prompt.md)。
+
+使用的是 Haiku 3.5 模型。
