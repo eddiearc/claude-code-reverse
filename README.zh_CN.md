@@ -1,6 +1,8 @@
 # Claude Code 逆向工程，2025-07 新版
 
-> [B 站视频](https://www.bilibili.com/video/BV1MJ8fzzEcw/?share_source=copy_web&vd_source=146877216054a691943ec0ee013940e9)
+> [B 站视频 上集](https://www.bilibili.com/video/BV1MJ8fzzEcw/?share_source=copy_web&vd_source=146877216054a691943ec0ee013940e9)
+>
+> [B 站视频 下集](https://www.bilibili.com/video/BV1gPh4zWEVS/?share_source=copy_web&vd_source=146877216054a691943ec0ee013940e9)
 
 **🚀 快速体验**: 通过交互式可视化工具体验逆向分析结果：[https://yuyz0112.github.io/claude-code-reverse/visualize.html](https://yuyz0112.github.io/claude-code-reverse/visualize.html)
 
