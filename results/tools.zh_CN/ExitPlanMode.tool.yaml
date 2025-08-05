@@ -1,0 +1,23 @@
+name: ExitPlanMode
+description: >
+  当您处于计划模式并已完成展示计划且准备编码时，请使用此工具。这将提示用户退出计划模式。
+
+  重要：仅在任务需要规划需要编写代码的任务的实施步骤时才使用此工具。对于研究任务——收集信息、搜索文件、读取文件或通常试图理解代码库——不要使用此工具。
+
+
+  例如：
+
+  1. 初始任务："搜索并理解代码库中vim模式的实现" - 不要使用退出计划模式工具，因为您不是在规划任务的实施步骤。
+
+  2. 初始任务："帮我为vim实现yank模式" - 在完成规划任务的实施步骤后使用退出计划模式工具。
+input_schema:
+  type: object
+  properties:
+    plan:
+      type: string
+      description: >-
+        您提出的计划，您希望征求用户批准。支持markdown。计划应该相当简洁。
+  required:
+    - plan
+  additionalProperties: false
+  $schema: http://json-schema.org/draft-07/schema#

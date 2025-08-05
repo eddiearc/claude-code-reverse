@@ -1,0 +1,40 @@
+name: Edit
+description: >-
+  在文件中执行精确的字符串替换。
+
+
+  使用说明：
+
+  - 在编辑之前，您必须至少使用一次`Read`工具。如果您在未读取文件的情况下尝试编辑，此工具将出错。
+
+  - 从Read工具输出编辑文本时，确保保留行号前缀之后出现的确切缩进（制表符/空格）。行号前缀格式是：空格 + 行号 + 制表符。制表符之后的所有内容都是要匹配的实际文件内容。永远不要在old_string或new_string中包含行号前缀的任何部分。
+
+  - 始终首选编辑代码库中的现有文件。除非明确要求，否则永远不要编写新文件。
+
+  - 只有在用户明确要求时才使用表情符号。避免向文件添加表情符号，除非被要求。
+
+  - 如果`old_string`在文件中不唯一，编辑将失败。要么提供带有更多周围上下文的更大字符串使其唯一，要么使用`replace_all`来更改`old_string`的每个实例。
+
+  - 使用`replace_all`在文件中替换和重命名字符串。此参数在您想要重命名变量时很有用。
+input_schema:
+  type: object
+  properties:
+    file_path:
+      type: string
+      description: 要修改的文件的绝对路径
+    old_string:
+      type: string
+      description: 要替换的文本
+    new_string:
+      type: string
+      description: 要替换的新文本（必须与old_string不同）
+    replace_all:
+      type: boolean
+      default: false
+      description: 替换所有old_string的出现（默认false）
+  required:
+    - file_path
+    - old_string
+    - new_string
+  additionalProperties: false
+  $schema: http://json-schema.org/draft-07/schema#

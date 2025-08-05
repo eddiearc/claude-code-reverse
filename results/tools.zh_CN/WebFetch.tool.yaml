@@ -1,0 +1,33 @@
+name: WebFetch
+description: >-
+  - 从指定URL获取内容并使用AI模型处理
+  - 接受URL和提示作为输入
+  - 获取URL内容，将HTML转换为markdown
+  - 使用小型、快速模型通过提示处理内容
+  - 返回模型对内容的响应
+  - 当您需要检索和分析网页内容时使用此工具
+
+  使用说明：
+    - 重要：如果有MCP提供的网页获取工具可用，请优先使用该工具而不是此工具，因为它可能限制更少。所有MCP提供的工具都以"mcp__"开头。
+    - URL必须是格式完整的有效URL
+    - HTTP URL将自动升级为HTTPS
+    - 提示应描述您想从页面中提取的信息
+    - 此工具是只读的，不会修改任何文件
+    - 如果内容很大，结果可能会被摘要
+    - 包含自清洁的15分钟缓存，用于重复访问同一URL时提供更快响应
+    - 当URL重定向到不同主机时，工具会通知您并以特殊格式提供重定向URL。然后您应该用重定向URL发出新的WebFetch请求来获取内容。
+input_schema:
+  type: object
+  properties:
+    url:
+      type: string
+      format: uri
+      description: 要获取内容的URL
+    prompt:
+      type: string
+      description: 在获取的内容上运行的提示
+  required:
+    - url
+    - prompt
+  additionalProperties: false
+  $schema: http://json-schema.org/draft-07/schema#

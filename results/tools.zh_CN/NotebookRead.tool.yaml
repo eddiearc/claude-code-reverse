@@ -1,0 +1,18 @@
+name: NotebookRead
+description: >-
+  读取Jupyter笔记本（.ipynb文件）并返回所有单元格及其输出。Jupyter笔记本是结合代码、文本和可视化的交互式文档，通常用于数据分析和科学计算。notebook_path参数必须是绝对路径，不是相对路径。
+input_schema:
+  type: object
+  properties:
+    notebook_path:
+      type: string
+      description: >-
+        要读取的Jupyter笔记本文件的绝对路径（必须是绝对路径，不是相对路径）
+    cell_id:
+      type: string
+      description: >-
+        要读取的特定单元格的ID。如果未提供，将读取所有单元格。
+  required:
+    - notebook_path
+  additionalProperties: false
+  $schema: http://json-schema.org/draft-07/schema#

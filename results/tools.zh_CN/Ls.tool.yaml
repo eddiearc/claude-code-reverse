@@ -1,0 +1,19 @@
+name: LS
+description: >-
+  列出给定路径中的文件和目录。path参数必须是绝对路径，不是相对路径。您可以选择使用ignore参数提供要忽略的glob模式数组。如果您知道要搜索的目录，通常应该首选Glob和Grep工具。
+input_schema:
+  type: object
+  properties:
+    path:
+      type: string
+      description: >-
+        要列出的目录的绝对路径（必须是绝对路径，不是相对路径）
+    ignore:
+      type: array
+      items:
+        type: string
+      description: 要忽略的glob模式列表
+  required:
+    - path
+  additionalProperties: false
+  $schema: http://json-schema.org/draft-07/schema#

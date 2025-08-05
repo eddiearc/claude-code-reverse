@@ -1,0 +1,69 @@
+name: Grep
+description: |
+  基于ripgrep的强大搜索工具
+
+    使用说明：
+    - 始终使用Grep进行搜索任务。永远不要将`grep`或`rg`作为Bash命令调用。Grep工具已针对正确的权限和访问进行了优化。
+    - 支持完整的正则表达式语法（例如，"log.*Error"、"function\s+\w+"）
+    - 使用glob参数（例如，"*.js"、"**/*.tsx"）或类型参数（例如，"js"、"py"、"rust"）过滤文件
+    - 输出模式："content"显示匹配的行，"files_with_matches"仅显示文件路径（默认），"count"显示匹配计数
+    - 对需要多轮的开放式搜索使用Task工具
+    - 模式语法：使用ripgrep（不是grep）- 字面大括号需要转义（使用`interface\{\}`查找Go代码中的`interface{}`）
+    - 多行匹配：默认情况下，模式仅在单行内匹配。对于跨行模式如`struct \{[\s\S]*?field`，使用`multiline: true`
+input_schema:
+  type: object
+  properties:
+    pattern:
+      type: string
+      description: 要在文件内容中搜索的正则表达式模式
+    path:
+      type: string
+      description: >-
+        要搜索的文件或目录（rg PATH）。默认为当前工作目录。
+    glob:
+      type: string
+      description: >-
+        用于过滤文件的Glob模式（例如"*.js"、"*.{ts,tsx}"）- 映射到rg --glob
+    output_mode:
+      type: string
+      enum:
+        - content
+        - files_with_matches
+        - count
+      description: >-
+        输出模式："content"显示匹配的行（支持-A/-B/-C上下文、-n行号、head_limit），"files_with_matches"显示文件路径（支持head_limit），"count"显示匹配计数（支持head_limit）。默认为"files_with_matches"。
+    '-B':
+      type: number
+      description: >-
+        每次匹配前显示的行数（rg -B）。需要output_mode: "content"，否则忽略。
+    '-A':
+      type: number
+      description: >-
+        每次匹配后显示的行数（rg -A）。需要output_mode: "content"，否则忽略。
+    '-C':
+      type: number
+      description: >-
+        每次匹配前后显示的行数（rg -C）。需要output_mode: "content"，否则忽略。
+    '-n':
+      type: boolean
+      description: >-
+        在输出中显示行号（rg -n）。需要output_mode: "content"，否则忽略。
+    '-i':
+      type: boolean
+      description: 大小写不敏感搜索（rg -i）
+    type:
+      type: string
+      description: >-
+        要搜索的文件类型（rg --type）。常见类型：js、py、rust、go、java等。对于标准文件类型比include更高效。
+    head_limit:
+      type: number
+      description: >-
+        将输出限制为前N行/条目，等同于"| head -N"。适用于所有输出模式：content（限制输出行），files_with_matches（限制文件路径），count（限制计数条目）。未指定时，显示ripgrep的所有结果。
+    multiline:
+      type: boolean
+      description: >-
+        启用多行模式，其中.匹配换行符，模式可以跨行（rg -U --multiline-dotall）。默认：false。
+  required:
+    - pattern
+  additionalProperties: false
+  $schema: http://json-schema.org/draft-07/schema#

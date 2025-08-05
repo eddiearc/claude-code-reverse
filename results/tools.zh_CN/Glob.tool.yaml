@@ -1,0 +1,27 @@
+name: Glob
+description: >-
+  - 快速文件模式匹配工具，适用于任何大小的代码库
+
+  - 支持glob模式，如"**/*.js"或"src/**/*.ts"
+
+  - 返回按修改时间排序的匹配文件路径
+
+  - 当您需要按名称模式查找文件时使用此工具
+
+  - 当您正在进行可能需要多轮globbing和grepping的开放式搜索时，请改用Agent工具
+
+  - 您有能力在单个响应中调用多个工具。始终批量执行多个可能有用的推测性搜索会更好。
+input_schema:
+  type: object
+  properties:
+    pattern:
+      type: string
+      description: 用于匹配文件的glob模式
+    path:
+      type: string
+      description: >-
+        要搜索的目录。如果未指定，将使用当前工作目录。重要：省略此字段以使用默认目录。不要输入"undefined"或"null" - 只需省略它即可使用默认行为。如果提供，必须是有效的目录路径。
+  required:
+    - pattern
+  additionalProperties: false
+  $schema: http://json-schema.org/draft-07/schema#

@@ -1,0 +1,48 @@
+name: Read
+description: >-
+  从本地文件系统读取文件。您可以使用此工具直接访问任何文件。
+
+  假设此工具能够读取机器上的所有文件。如果用户提供文件路径，请假设该路径有效。读取不存在的文件是可以的；会返回错误。
+
+
+  使用说明：
+
+  - file_path参数必须是绝对路径，不是相对路径
+
+  - 默认情况下，它从文件开头读取最多2000行
+
+  - 您可以选择指定行偏移和限制（特别适用于长文件），但建议通过不提供这些参数来读取整个文件
+
+  - 任何超过2000个字符的行都会被截断
+
+  - 结果使用cat -n格式返回，行号从1开始
+
+  - 此工具允许Claude Code读取图像（例如PNG、JPG等）。读取图像文件时，内容以视觉方式呈现，因为Claude Code是多模态LLM。
+
+  - 此工具可以读取PDF文件（.pdf）。PDF按页处理，提取文本和视觉内容进行分析。
+
+  - 对于Jupyter笔记本（.ipynb文件），请使用NotebookRead
+
+  - 您有能力在单个响应中调用多个工具。始终批量推测性地读取多个可能有用的文件会更好。
+
+  - 您会经常被要求读取屏幕截图。如果用户提供屏幕截图路径，请始终使用此工具查看路径中的文件。此工具适用于所有临时文件路径，如/var/folders/123/abc/T/TemporaryItems/NSIRD_screencaptureui_ZfB1tD/Screenshot.png
+
+  - 如果您读取存在但内容为空的文件，将收到系统提醒警告而不是文件内容。
+input_schema:
+  type: object
+  properties:
+    file_path:
+      type: string
+      description: 要读取的文件的绝对路径
+    offset:
+      type: number
+      description: >-
+        开始读取的行号。仅在文件太大无法一次读取时提供
+    limit:
+      type: number
+      description: >-
+        要读取的行数。仅在文件太大无法一次读取时提供。
+  required:
+    - file_path
+  additionalProperties: false
+  $schema: http://json-schema.org/draft-07/schema#

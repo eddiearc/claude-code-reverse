@@ -1,0 +1,37 @@
+name: NotebookEdit
+description: >-
+  完全替换Jupyter笔记本（.ipynb文件）中特定单元格的内容为新源代码。Jupyter笔记本是结合代码、文本和可视化的交互式文档，通常用于数据分析和科学计算。notebook_path参数必须是绝对路径，不是相对路径。cell_number是0索引的。使用edit_mode=insert在cell_number指定的索引处添加新单元格。使用edit_mode=delete删除cell_number指定索引处的单元格。
+input_schema:
+  type: object
+  properties:
+    notebook_path:
+      type: string
+      description: >-
+        要编辑的Jupyter笔记本文件的绝对路径（必须是绝对路径，不是相对路径）
+    cell_id:
+      type: string
+      description: >-
+        要编辑的单元格的ID。插入新单元格时，新单元格将插入到具有此ID的单元格之后，如果未指定则在开头插入。
+    new_source:
+      type: string
+      description: 单元格的新源代码
+    cell_type:
+      type: string
+      enum:
+        - code
+        - markdown
+      description: >-
+        单元格的类型（code或markdown）。如果未指定，默认为当前单元格类型。如果使用edit_mode=insert，则为必需。
+    edit_mode:
+      type: string
+      enum:
+        - replace
+        - insert
+        - delete
+      description: >-
+        要进行的编辑类型（replace、insert、delete）。默认为replace。
+  required:
+    - notebook_path
+    - new_source
+  additionalProperties: false
+  $schema: http://json-schema.org/draft-07/schema#
