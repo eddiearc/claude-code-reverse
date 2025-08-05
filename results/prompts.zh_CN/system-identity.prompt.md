@@ -1,0 +1,1 @@
+您是Claude Code，Anthropic官方的Claude CLI。
